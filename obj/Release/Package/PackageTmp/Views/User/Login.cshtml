@@ -1,0 +1,115 @@
+﻿@{
+    //Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登入</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+    <div class="layui-container fly-marginTop">
+        <div class="fly-panel fly-panel-user" pad20>
+            <div class="layui-tab layui-tab-brief" lay-filter="user">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">登入</li>
+                    <li><a href="/User/Reg">注册</a></li>
+                </ul>
+                <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form layui-form-pane">
+                            <form action="/User/LoginControll" method="post">
+                                <div class="layui-form-item">
+                                    <label for="L_email" class="layui-form-label">用户名</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="L_email" name="userId" required lay-verify="required" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label for="L_pass" class="layui-form-label">密码</label>
+                                    <div class="layui-input-inline">
+                                        <input type="password" id="L_pass" name="passWord" required lay-verify="required" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label for="L_vercode" class="layui-form-label">人类验证</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="L_vercode" name="vercode" required lay-verify="required" placeholder="请回答后面的问题" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid">
+                                        <span style="color: #c00;" id="quest"></span>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <button class="layui-btn" lay-filter="login" lay-submit>立即登录</button>
+                                    <span style="padding-left:20px;">
+                                        <a href="forget.html">忘记密码？</a>
+                                    </span>
+                                </div>
+                                @*<div class="layui-form-item fly-form-app">
+                                    <span>或者使用社交账号登入</span>
+                                    <a href="" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-qq" title="QQ登入"></a>
+                                    <a href="" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-weibo" title="微博登入"></a>
+                                </div>*@
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        layui.config({
+            version: "3.0.0"
+          , base: '../Assets/mods/'
+        }).extend({
+            fly: 'index'
+        }).use('fly');
+        $(function () {
+            var count = 0;
+            var a = Math.round(parseInt(Math.random() * 100));
+            var b = Math.round(parseInt(Math.random() * 100));
+            count = a + b;
+            $('#quest').append(a + "+" + b + "=?");
+            $('#answer').attr("value", count);
+
+            layui.use(['form', 'fly'], function () {
+                form = layui.form;
+                fly = layui.fly;
+
+                //登入
+                form.on('submit(login)', function (data) {
+                    console.log(data);
+                    if (count != data.field.vercode) {
+                        $('#L_vercode').val("");
+                        han.message("是我的问题太过困难吗");
+                        return false;
+                    }
+                    var action = $(data.form).attr('action'), button = $(data.elem);
+                    fly.json(action, data.field, function (res) {
+                        var end = function () {
+                            if (res.action) {
+                                location.href = res.action;
+                            } else {
+                                fly.form[action || button.attr('key')](data.field, data.form);
+                            }
+                        };
+                        if (res.Success) {
+                            han.message("嘿 你~ 那个我叫...");
+                            window.location.href = "/";
+                        }
+                        else {
+                            han.message(res.Message);
+                        }
+                    });
+                    return false;
+                });
+            });
+            
+        });
+    </script>
+</body>
+</html>

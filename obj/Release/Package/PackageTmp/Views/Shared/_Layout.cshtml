@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="~/Assets/images/avatar/00.jpg" type="image/x-icon" />
+    <link rel="stylesheet" href="../Assets/layui/css/layui.css">
+    <link rel="stylesheet" href="../Assets/css/global.css">
+    <script src="../Assets/layui/layui.js"></script>
+    <script src="../Scripts/han.core.js"></script>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <script src="../Scripts/han.common.js"></script>
+    @*<script src="../Assets/mods/index.js"></script>
+    <script src="../Assets/mods/case.js"></script>
+    <script src="../Assets/mods/face.js"></script>
+    <script src="../Assets/mods/jie.js"></script>
+    <script src="../Assets/mods/user.js"></script>*@
+    
+</head>
+<body>
+    <div class="fly-header layui-bg-black">
+        <div class="layui-container">
+            <a class="fly-logo" href="/">
+                <img src="../Assets/images/logo.png" alt="Han">
+            </a>
+            <ul class="layui-nav fly-nav layui-hide-xs">
+                    <li class="layui-nav-item layui-this">
+                        <a href="/Home/History"><i class="iconfont icon-jiaoliu"></i>史记</a>
+                    </li>
+                </ul>
+
+            <ul class="layui-nav fly-nav-user">
+
+                <!-- 未登入的状态 -->
+                <div id="NotLogin" style="display:none">
+                    <li class="layui-nav-item">
+                        <a class="iconfont icon-touxiang layui-hide-xs" href="/User/Login"></a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="/User/Login">登入</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="/User/Reg">注册</a>
+                    </li>
+                </div>
+                <!-- <li class="layui-nav-item layui-hide-xs">
+                  <a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                  <a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+                </li> -->
+                <!-- 登入后的状态 -->
+
+                <li id="Login" class="layui-nav-item" style="display:none;">
+                    <a id="indexError" class="fly-nav-avatar" href="javascript:;">
+                        <cite id="UserName" class="layui-hide-xs">贤心</cite>
+                        <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>
+                        <i id="UserLevel" class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>
+                        <img id="UserImg" src="">
+                    </a>
+                    <dl id="error" class="layui-nav-child layui-anim layui-anim-upbit">
+                    <dd><a id="user_Set" href="javascript:;"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+                    <dd style="display:none"><a id="user_Msg" href="javascript:;"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+                    <dd><a id="user_Home" href="javascript:;"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+                    <hr style="margin: 5px 0;">
+                    <dd><a id="user_LogOut" href="javascript:;" style="text-align: center;">退出</a></dd>
+                </dl>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <div id="MenuHead" class="fly-panel fly-column">
+        <div class="layui-container">
+            <ul class="layui-clear">
+                <li class="layui-hide-xs layui-this" id="index"><a href="/">首页</a></li>
+                <li id="Quiz"><a href="/Home/Column?Types=1&&State=0&&Mode=0">提问</a></li>
+                <li id="Share"><a href="/Home/Column?Types=2&&State=0&&Mode=0">分享</a></li>
+                <li id="Discuss"><a href="/Home/Column?Types=3&&State=0&&Mode=0">讨论</a></liid="Discuss">
+                <li id="Suggest"><a href="/Home/Column?Types=4&&State=0&&Mode=0">建议</a></li>
+                <li id="Notice"><a href="/Home/Column?Types=5&&State=0&&Mode=0" id="Notice">公告</a></li>
+                <li id="Moment"><a href="/Home/Column?Types=6&&State=0&&Mode=0">动态</a></li>
+                <li id="Line" class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li>
+
+                <!-- 用户登入后显示 -->
+                <li id="MyPost" class="layui-hide-xs layui-hide-sm layui-hidden-md layui-hidden-lg"><a id="main_PublishPost" href="javascript:;">我发表的贴</a></li>
+                <li id="MyFavoritePost" class="layui-hide-xs layui-hide-sm layui-hidden-md layui-hidden-lg"><a id="main_CollectPost" href="javascript:;">我收藏的贴</a></li>
+            </ul>
+
+            <div class="fly-column-right layui-hide-xs">
+                <span class="fly-search"><i class="layui-icon"></i></span>
+                <a href="/Posts/PostAdd" class="layui-btn">发表新帖</a>
+            </div>
+            @*<div class="layui-hide-sm layui-show-xs-block" style="margin-top: -10px; padding-bottom: 10px; text-align: center;">
+                    <a href="jie/add.html" class="layui-btn">发表新帖</a>
+                </div>*@
+        </div>
+    </div>
+    @RenderBody()
+    <div class="fly-footer">
+        <p>© Layoomiety.han - Copyright</p>
+    </div>
+</body>
+<script>
+    //$(function () {
+    //    layui.config({
+    //        //version: "3.0.0"
+    //        base: '../Assets/mods/'
+    //    }).extend({
+    //        fly: 'index'
+    //        //,jie:'jie'
+    //    });
+    //});
+    han.ajax({
+        url: '/Home/GetUserLoginInfo',
+        success: function (data) {
+            if (data.Success) {
+                //执行json数据解析逻辑
+                var _isOk = common.loadUserInfo(data.Data);
+            }
+            else {
+                //这边应该需要跳转到错误页面
+                HidenLoginState();
+            }
+        }
+    });
+</script>
+</html>

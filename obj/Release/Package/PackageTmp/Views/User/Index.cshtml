@@ -1,0 +1,196 @@
+﻿@{
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>用户中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body style="margin-top: 75px;">
+    <div class="layui-container fly-marginTop fly-user-main">
+        <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+            <li class="layui-nav-item">
+                <a href="/User/Home?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe609;</i>
+                    我的主页
+                </a>
+            </li>
+            <li class="layui-nav-item  layui-this">
+                <a href="javascript:;">
+                    <i class="layui-icon">&#xe612;</i>
+                    用户中心
+                </a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="/User/Set?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe620;</i>
+                    基本设置
+                </a>
+            </li>
+            @*<li class="layui-nav-item">
+                <a href="/User/Message?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe611;</i>
+                    我的消息
+                </a>
+            </li>*@
+        </ul>
+
+        <div class="site-tree-mobile layui-hide">
+            <i class="layui-icon">&#xe602;</i>
+        </div>
+        <div class="site-mobile-shade"></div>
+
+        <div class="site-tree-mobile layui-hide">
+            <i class="layui-icon">&#xe602;</i>
+        </div>
+        <div class="site-mobile-shade"></div>
+
+
+        <div class="fly-panel fly-panel-user" pad20>
+
+            <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title" id="LAY_mine">
+                    <li data-type="mine-jie" lay-id="index" class="layui-this">我发的帖（<span id="publishCount"></span>）</li>
+                    <li data-type="collection" data-url="/collection/find/" lay-id="collection">我收藏的帖（<span id="collectcount"></span>）</li>
+                </ul>
+                <div class="layui-tab-content" style="padding: 20px 0;">
+                    <div class="layui-tab-item layui-show">
+                        <ul  id="ul_PublishPost" class="mine-view jie-row">
+                            
+                            <!-- 无数据时 -->
+                            <div id="publishPostNone" class="fly-none" style="display:none">没有相关数据</div>
+                        </ul>
+                        <div id="LAY_page"></div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <ul id="ul_CollectPost" class="mine-view jie-row">
+
+                            <!-- 无数据时 -->
+                            <div id="collectPostNone" class="fly-none" style="display:none">没有相关数据</div>
+                        </ul>
+                        <div id="LAY_page1"></div>
+                    </div>
+                </div>
+
+                @*<ul class="layui-tab-title" id="LAY_mine">
+                    <li lay-id="index" class="layui-this">我发的帖（<span id="publishCount"></span>）</li>
+                    <li lay-id="collection">我收藏的帖（<span id="collectcount"></span>）</li>
+                </ul>
+                <div class="layui-tab-content" style="padding: 20px 0;">
+
+                    <div class="layui-tab-item layui-show">
+                        <ul id="ul_PublishPost" class="mine-view jie-row">
+
+                            <!-- 无数据时 -->
+                            <div id="publishPostNone" class="fly-none" style="display:none">没有相关数据</div>
+                        </ul>
+                        <div id="LAY_page"></div>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <ul id="ul_CollectPost" class="mine-view jie-row">
+
+                            <!-- 无数据时 -->
+                            <div id="collectPostNone" class="fly-none" style="display:none">没有相关数据</div>
+                        </ul>
+                        <div id="LAY_page1"></div>
+                    </div>
+
+                </div>*@
+            </div>
+
+        </div>
+    </div>
+    <!--发表的帖子模板-->
+    <script id='PublishPostTpl' type="text/html">
+        <li>
+            <a class="jie-title" href="/Posts/PostDetail?TitleId={{ d.TitleId }}" target="_blank">{{ d.Title }}</a>
+            <i>{{ d.Time }}</i>
+            <a class="mine-edit" href="/Posts/PostEdit?PostId={{ d.TitleId }}">编辑</a>
+            <em>{{ d.Visitor }}阅/{{ d.AnswerNum }}答</em>
+        </li>
+    </script>
+    <!--收藏的帖子模板-->
+    <script id='CollectPostTpl' type="text/html">
+        <li>
+            <a class="jie-title" href="/Posts/PostDetail?TitleId={{ d.TieleId }}" target="_blank">{{ d.Title }}</a>
+            <i>收藏于{{ d.Time }}</i>
+        </li>
+    </script>
+    <script>
+        $(function () {
+            //使顶部菜单栏消失
+            $('#MenuHead').css("display", "none");
+
+            GetPublishPost();
+            GetCollectPost();
+
+            //设置发表了的帖子
+            function GetPublishPost() {
+                han.ajax({
+                    url: '/Posts/GetPostByUserId',
+                    success: function (data) {
+                        if (data.Success) {
+                            $('#publishCount').text(data.Data.length);
+                            for(var i=0;i<data.Data.length;i++){
+                                han.tpl({
+                                    data: { //数据
+                                        "TitleId": data.Data[i].PostId
+                                        , "Title": data.Data[i].Title
+                                        , "Time": data.Data[i].Time
+                                        , "AnswerNum": data.Data[i].AnswerNum
+                                        , "Visitor": data.Data[i].Visitor
+                                    },
+                                    view: PublishPostTpl.innerHTML,
+                                    id: '#ul_PublishPost'
+                                });
+                            }
+                        }
+                        else {
+                            $('#publishCount').text("0");
+                            $("#publishPostNone").css("display","block");
+                        }
+                    }
+                });
+            }
+
+            //设置收藏的帖子
+            function GetCollectPost() {
+                han.ajax({
+                    url: '/Posts/GetCollectByUserId',
+                    success: function (data) {
+                        if (data.Success) {
+                            $('#collectCount').text(data.Data.length);
+                            for (var i = 0; i < data.Data.length; i++) {
+                                han.tpl({
+                                    data: { //数据
+                                        "TitleId": data.Data[i].PostId
+                                        , "Title": data.Data[i].Title
+                                        , "Time": data.Data[i].CollectTime
+                                    },
+                                    view: CollectPostTpl.innerHTML,
+                                    id: '#ul_CollectPost'
+                                });
+                            }
+                        }
+                        else {
+                            $('#collectCount').text("0");
+                            $("#collectPostNone").css("display", "block");
+                        }
+                    }
+                });
+            }
+        });
+        layui.config({
+            version: "2.0.0"
+            , base: '../Assets/mods/'
+        }).extend({
+            fly: 'index'
+        }).use('fly');
+    </script>
+</body>
+</html>

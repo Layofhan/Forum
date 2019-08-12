@@ -1,0 +1,256 @@
+﻿@{
+    //Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lay社区</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Lay社区">
+    <meta name="description" content="Lay社区作为Han心中乌托邦世界">
+    <style type="text/css">
+        .spec{}
+    </style>
+</head>
+<body style="margin-top: 65px;">
+    <div class="fly-home fly-panel">
+        <img id="HeadPortrait" src="" alt="哎呀 头像莫得了">
+        <i id="CommunityCer" class="iconfont icon-renzheng" style="display:none" title="社区认证"></i>
+        <h1>
+            <i id="UserNames"></i>
+            <i id="SexForBoy" class="iconfont icon-nan" style="display:none"></i>
+            <i id="SexForGirl" class="iconfont icon-nv" style="display:none"></i>  
+            <i id="Grade" class="layui-badge fly-badge-vip"></i>
+            
+            <span id="Admin" style="color:#c00;display:none">（管理员）</span>
+            <span id="CommunityGard" style="color:#5FB878;display:none">（社区之光）</span>
+            <span id="Life" style="display:none">（该号已被封）</span>
+            
+        </h1>
+
+        <p id="CommunityCerInfo" style="padding: 10px 0; color: #5FB878;display:none;"><i></i></p>
+
+        <p class="fly-home-info">
+            <i class="iconfont icon-kiss" title="飞吻"></i><span id="Integral" style="color: #FF7200;"></span><span> 飞吻</span>
+            <i class="iconfont icon-shijian"></i><span id="JoinTime"></span><span>加入</span>
+            <i class="iconfont icon-chengshi"></i><span>来自</span><span id="Location"></span>
+        </p>
+
+        <p id="WhatsUp" class="fly-home-sign">（有点懒 对不起）</p>
+
+        @*<div class="fly-sns" data-user="">
+            <a href="javascript:;" class="layui-btn layui-btn-primary fly-imActive" data-type="addFriend">加为好友</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal fly-imActive" data-type="chat">发起会话</a>
+        </div>*@
+
+    </div>
+
+    <div class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6 fly-home-jie">
+                <div class="fly-panel">
+                    <h3 class="fly-panel-title">贤心 最近的提问</h3>
+                    <ul id="mainAboutQuiz" class="jie-row">
+                        <div id="QuizEmpty" class="fly-none" style="min-height: 50px; padding:30px 0; height:auto;display:none;"><i style="font-size:14px;">没有发表任何求解</i></div>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="layui-col-md6 fly-home-da">
+                <div class="fly-panel">
+                    <h3 class="fly-panel-title">贤心 最近的回答</h3>
+                    <ul id="mainAboutAnswer" class="home-jieda">
+                        <div id="AnswerEmpty" class="fly-none" style="min-height: 50px; padding:30px 0; height:auto;display:none"><span>没有回答任何问题</span></div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id='TitleQuiz' type="text/html">
+        <li>
+            <span class="fly-jing" style="{{#  if(d.IsGood == 0){ }}display:none{{# } }}">精</span>
+            <a href="/Posts/PostDetail?TitleId={{ d.PostId }}" class="jie-title"> {{ d.Title }}</a>
+            <i>{{ d.Time }}</i>
+            <em class="layui-hide-xs">{{ d.Visitor }}阅/{{ d.AnswerCount }}答</em>
+        </li>
+    </script>
+    <script id="TitleAnswer" type="text/html">
+        <li>
+            <p>
+                <span>{{ d.Time }}</span>
+                在<a href="/Posts/PostDetail?TitleId={{ d.PostId }}">{{ d.Issue }}</a>中回答：
+            </p>
+            <div class="home-dacontent spec">
+               {{ d.Content }}
+            </div>
+            
+        </li>
+    </script>
+    <script>
+        $(function () {
+            layui.config({
+                //version: "3.0.0"
+                base: '../Assets/mods/'
+            }).extend({
+                fly: 'index'
+                //,jie:'jie'
+            });
+        //使顶部菜单栏消失
+            $('#MenuHead').css("display", "none");
+           // AppendAnswer();
+        AppendUserInfo();
+        //添加最近提问
+        function AppendQuiz() {
+            han.ajax({
+                url: '/User/GetQuizByTimeandUser',
+                data: { UserId: '@ViewBag.UserId' },
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Data == null || data.Data == "") {
+                            $("#QuizEmpty").css("display", "block");
+                        }
+                        for (var i = 0; i < data.Data.length; i++) {
+                            han.tpl({
+                                data: { //数据
+                                    "IsGood": data.Data[i].IsGood
+                                    , "Title": data.Data[i].Title
+                                    , "Time": data.Data[i].Time
+                                    , "Visitor": data.Data[i].Visitor
+                                    , "AnswerCount": data.Data[i].AnswerCount
+                                    , "PostId": data.Data[i].PostId
+                                },
+                                view: TitleQuiz.innerHTML,
+                                id: '#mainAboutQuiz'
+                            });
+                        }
+                    }
+                    else {
+                        $("#QuizEmpty").css("display", "block");
+                    }
+                    AppendAnswer();
+                }
+            });
+        };
+
+        //添加回答
+        function AppendAnswer() {
+            han.ajax({
+                url: '/User/GetAnswerByUser',
+                data: {
+                    UserId: '@ViewBag.UserId'
+                },
+                success: function (data) {
+                    if (data.Success) {
+                        if (data.Data == null || data.Data == "") {
+                            $("#AnswerEmpty").css("display", "block");
+                        }
+                        for (var i = 0; i < data.Data.length; i++) {
+                            han.tpl({
+                                data: { //数据
+                                    "Time": data.Data[i].Time
+                                    , "PostId": data.Data[i].PostId
+                                    , "Issue": data.Data[i].Issue
+                                    , "Content": data.Data[i].Content
+                                },
+                                view: TitleAnswer.innerHTML,
+                                id: '#mainAboutAnswer'
+                            });
+                        }
+                        layui.use(['fly', 'face', 'laypage', 'layer'], function () {
+                            var fly = layui.fly;
+                            //console.log($('#hu'));
+                            // #replyconte
+                            $('.home-dacontent.spec').each(function () {
+                                var othis = $(this), html = othis.html();
+
+                                othis.html(fly.content(html));
+                            });
+                        });
+                        layui.use(['jie', 'element'], function () {
+                            var jie = layui.jie;
+                            jie.hello();
+                        });
+                    }
+                    else {
+                        $("#AnswerEmpty").css("display", "block");
+                    }
+                    
+                        layui.config({
+                            base: '../Assets/mods/'
+                        }).extend({
+                            jie: 'jie'
+                            , version: true
+                        });
+                    layui.use(['jie', 'element'], function () {
+                        var jie = layui.jie;
+                        jie.hello();
+                    });
+                }
+            });
+        };
+
+        //设置用户信息
+        function AppendUserInfo() {
+            han.ajax({
+                url: '/User/GetUserInfo',
+                data: {
+                    UserId: '@ViewBag.UserId'
+                },
+                success: function (data) {
+                    if (data.Success) {
+                        $('#HeadPortrait').attr("src", data.Data.ImgUrl);
+                        if (data.Data.IsCommunityGard)//设置社区之光
+                        {
+                            $('#CommunityCer').css("display", "");
+                            $('#CommunityGard').css("display", "");
+                            if (data.Data.AuthInfo != null || data.Data.AuthInfo != "") { //设置认证信息
+                                $('#CommunityCerInfo').css("display", "");
+                                $('#CommunityCerInfo').text("认证信息:" + data.Data.AuthInfo);
+                            }
+                        }
+
+                        if (data.Data.Sex == 1) {//设置性别
+                            $("#SexForBoy").css("display", "");
+                        }
+                        else {
+                            $("#SexForGirl").css("display", "");
+                        }
+
+                        $('#Grade').text("VIP" + data.Data.Grade);//设置等级
+
+                        if (data.Data.IsAdmin) {//是否为管理员
+                            $('#Admin').css("display", "");
+                        }
+
+                        if (!data.Data.IsLife) {//是否被销号了
+                            $('#Life').css("display", "");
+                        }
+
+                        $('#Integral').text(data.Data.Point);//积分
+
+                        $('#JoinTime').text(data.Data.JoinTime);//设置加入时间
+
+                        $('#Location').text(data.Data.Location);//设置城市
+
+                        $('#UserNames').text(data.Data.Name);//设置用户名
+                        
+                        
+                        if (data.Data.WhatsUp != null || data.Data.WhatsUp != "")//设置签名
+                        {
+                            $('#WhatsUp').text(data.Data.WhatsUp);
+                        }
+                        AppendQuiz();
+                    }
+                    else {
+                        han.message("你搜的是撒个子人么");
+                    }
+                }
+            });
+        }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+﻿@{
+    //Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>帐号设置</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body style="margin-top:75px">
+    <div class="layui-container fly-marginTop fly-user-main">
+        <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+            <li class="layui-nav-item">
+                <a href="/User/Home?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe609;</i>
+                    我的主页
+                </a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="/User/Index?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe612;</i>
+                    用户中心
+                </a>
+            </li>
+            <li class="layui-nav-item layui-this">
+                <a href="javascript:;">
+                    <i class="layui-icon">&#xe620;</i>
+                    基本设置
+                </a>
+            </li>
+            @*<li class="layui-nav-item">
+                <a href="/User/Message?UserId=@ViewBag.UserId">
+                    <i class="layui-icon">&#xe611;</i>
+                    我的消息
+                </a>
+            </li>*@
+        </ul>
+
+        <div class="site-tree-mobile layui-hide">
+            <i class="layui-icon">&#xe602;</i>
+        </div>
+        <div class="site-mobile-shade"></div>
+
+        <div class="site-tree-mobile layui-hide">
+            <i class="layui-icon">&#xe602;</i>
+        </div>
+        <div class="site-mobile-shade"></div>
+
+
+        <div class="fly-panel fly-panel-user" pad20>
+            <div class="layui-tab layui-tab-brief" lay-filter="user">
+                <ul class="layui-tab-title" id="LAY_mine">
+                    <li class="layui-this" lay-id="info">我的资料</li>
+                    <li lay-id="avatar">头像</li>
+                    <li lay-id="pass">密码</li>
+                    @*<li lay-id="bind">帐号绑定</li>*@
+                </ul>
+                <div class="layui-tab-content" style="padding: 20px 0;">
+                    <div class="layui-form layui-form-pane layui-tab-item layui-show">
+                        <form >
+                            <div class="layui-form-item">
+                                <label for="L_username" class="layui-form-label">昵称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="L_username" name="username" required lay-verify="required" autocomplete="off" value="" class="layui-input">
+                                </div>
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="radio" id="L_sex_Man" name="sex" value="0" title="男">
+                                        <input type="radio" id="L_sex_Women" name="sex" value="1" title="女">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label for="L_city" class="layui-form-label">城市</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="L_city" name="city" autocomplete="off" value="" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item layui-form-text">
+                                <label for="L_sign" class="layui-form-label">签名</label>
+                                <div class="layui-input-block">
+                                    <textarea placeholder="随便写些什么刷下存在感" id="L_sign" name="sign" autocomplete="off" class="layui-textarea" style="height: 80px;"></textarea>
+                                </div>
+                            </div>
+                            
+                        </form>
+                        <div class="layui-form-item">
+                            <button class="layui-btn" lay-submit lay-filter="modiffyUserInfo">确认修改</button>
+                        </div>
+                    </div>
+
+                    <div class="layui-form layui-form-pane layui-tab-item">
+                        <div class="layui-form-item">
+                            <div class="avatar-add">
+                                <p>建议尺寸168*168，支持jpg、png、gif，最大不能超过500KB</p>
+                                <button id="uploadHeadPic" type="button" class="layui-btn upload-img">
+                                    <i class="layui-icon">&#xe67c;</i>上传头像
+                                </button>
+                                <img id="eg_headImge" src="">
+                                <span class="loading"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form layui-form-pane layui-tab-item">
+                        <form action="/User/ChangePassWord" method="post">
+                            <div class="layui-form-item">
+                                <label for="L_nowpass" class="layui-form-label">当前密码</label>
+                                <div class="layui-input-inline">
+                                    <input type="password" id="L_nowpass" name="nowpass" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label for="L_pass" class="layui-form-label">新密码</label>
+                                <div class="layui-input-inline">
+                                    <input type="password" id="L_pass" name="pass" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">6到16个字符</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label for="L_repass" class="layui-form-label">确认密码</label>
+                                <div class="layui-input-inline">
+                                    <input type="password" id="L_repass" name="repass" required lay-verify="required" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <button class="layui-btn" lay-submit lay-filter="modiffyPass">确认修改</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        $('#MenuHead').hide();
+        var UserInfo = true;
+        var PassWord = true;
+
+        layui.use(['form', 'upload'], function () {
+            var form = layui.form;
+            var upload = layui.upload;
+
+            //修改用户信息按钮
+            form.on('submit(modiffyUserInfo)', function (data) {
+                if (!UserInfo) {
+                    return false;
+                }
+                UserInfo = false;
+                han.ajax({
+                    url: "/User/ModifyUserInfo",
+                    type: "post",
+                    data: {
+                        userName: data.field.username,
+                        City: data.field.city,
+                        Sigh: data.field.sign,
+                        UserId: '@ViewBag.UserId',
+                        Sex:data.field.sex
+                    },
+                    beforeSend: function () {
+                        han.waiting();
+                    },
+                    success: function (data) {
+                        han.closewaiting();
+                        UserInfo = true;
+                        if (data.Success) {
+                            han.message("修改成功");
+                        }
+                        else {
+                            han.message(data.Message);
+                        }
+                    }
+                });
+                return false;
+            });
+
+            //修改密码
+            form.on('submit(modiffyPass)', function (data) {
+                if (!PassWord) {
+                    return false;
+                }
+                PassWord = false;
+                if (data.field.repass != data.field.pass) {
+                    han.message("两次密码不一致");
+                    return false;
+                }
+                if (data.field.nowpass === data.field.pass) {
+                    han.message("与原密码相同,无需更改");
+                    return false;
+                }
+                han.ajax({
+                    url: "/User/ChangePassWord",
+                    type: "post",
+                    data: {
+                        userId: '@ViewBag.UserId',
+                        oldPassword: data.field.nowpass,
+                        newPassword: data.field.pass
+                    },
+                    beforeSend: function () {
+                        han.waiting();
+                    },
+                    success: function (data) {
+                        han.closewaiting();
+                        PassWord = true;
+                        if (data.Success) {
+                            $("#L_nowpass").attr("value", "");
+                            $("#L_pass").attr("value", "");
+                            $("#L_repass").attr("value", "");
+                            han.message("修改成功");
+                        }
+                        else {
+                            han.message(data.Message);
+                        }
+                    }
+                });
+                return false;
+            });
+
+
+            //图片上传接口
+            upload.render({
+                elem: '#uploadHeadPic'
+               , url: '/User/UploadPic'
+               , size: 500
+               , before: function () {
+                   han.waiting();
+               }
+               , done: function (data) {
+                   han.closewaiting();
+                   if (data.Success) {
+                       $('#eg_headImge').attr("src", data.Message);
+                       han.message("上传成功");
+                   } else {
+                       han.message(data.message);
+                   }
+               }
+            });
+
+
+        });
+
+
+        //获取用户当前的信息
+        han.ajax({
+            url: "/User/GetUserInfo",
+            data: {
+                UserId: '@ViewBag.UserId'
+            },
+            success: function (data) {
+                if (data.Success) {
+                    $("#L_username").attr("value", data.Data.Name);
+                    $("#L_city").attr("value", data.Data.Location); 
+                    $("#L_sign").text(data.Data.WhatsUp);
+                    $('#eg_headImge').attr("src", data.Data.ImgUrl);
+                    if (data.Data.Sex == 1) {
+                        $("#L_sex_Man").next().click();
+                    }
+                    else {
+                        $("#L_sex_Women").next().click();
+                    }
+                }
+                else {
+                    han.message(data.Message);
+                }
+            }
+        });
+
+    })
+
+    layui.config({
+        version: "2.0.0"
+  , base: '../Assets/mods/'
+    }).extend({
+        fly: 'index'
+    }).use('fly');
+</script>
+</html>

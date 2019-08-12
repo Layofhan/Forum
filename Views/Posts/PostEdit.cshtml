@@ -1,0 +1,86 @@
+﻿@{
+    //Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>帖子编辑</title>
+</head>
+<body>
+    <div class="layui-container fly-marginTop">
+        <div class="fly-panel" pad20 style="padding-top: 5px;">
+            <!--<div class="fly-none">没有权限</div>-->
+            <div class="layui-form layui-form-pane">
+                <div class="layui-tab layui-tab-brief" lay-filter="user">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">编辑帖子</li>
+                    </ul>
+                    <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+                        <div class="layui-tab-item layui-show">
+                            <form action="/Posts/PostContentEdit?PostId=@ViewBag.PostId" method="post">
+                                <div class="layui-form-item layui-form-text">
+                                    <div class="layui-input-block">
+                                        <textarea id="L_content" name="content" required lay-verify="required" placeholder="详细描述" class="layui-textarea fly-editor" style="height: 260px;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label for="L_vercode" class="layui-form-label">人类验证</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="L_vercode" name="vercode" required lay-verify="required" placeholder="请回答后面的问题" autocomplete="off" class="layui-input">
+                                        <input type="hidden" name="id" id="answer" value="">
+                                    </div>
+                                    <div class="layui-form-mid">
+                                        <span style="color: #c00;" id="quest"></span>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <button class="layui-btn" lay-filter="postEdit" lay-submit>确认修改</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        layui.config({
+            version: "3.0.0"
+          , base: '../Assets/mods/'
+        }).extend({
+        fly: 'index'
+        }).use('fly');
+
+        $(function () {
+            var count = 0;
+            var a = Math.round(parseInt(Math.random() * 100));
+            var b = Math.round(parseInt(Math.random() * 100));
+            count = a + b;
+            $('#quest').append(a + "+" + b + "=");
+            $('#answer').attr("value", count);
+
+            //获取文章内容
+            han.ajax({
+                url: '/Posts/GetPostContent',
+                data: {
+                    PostId: '@ViewBag.PostId'
+                },
+                success: function (data) {
+                    if (data.Success) {
+                        $("#L_content").val(data.Data.Content);
+                    }
+                    else {
+                        han.message(data.Message);
+                    }
+                }
+            })
+        });
+    </script>
+
+</body>
+</html>

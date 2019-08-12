@@ -1,0 +1,472 @@
+﻿
+@{
+    //Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <title>详情页</title>
+</head>
+<body>
+    <div class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md8 content detail">
+                <div class="fly-panel detail-box">
+
+                    <h1 id="DetailTitle"></h1>
+
+                    <div id="DetailState" class="fly-detail-info">
+
+                        
+                        <span id="DetailData" class="fly-list-nums">
+                            <button id="Collect" class="layui-btn layui-btn-sm jie-admin jie-admin-collect" style="display:none">收藏</button>
+                        </span>
+                    </div>
+
+                    <div id="AuthorInfo" class="detail-about">
+                    </div>
+
+                    <div id="PostContent" class="detail-body photos">
+
+                    </div>
+
+                </div>
+
+                <a name="comment" id="location"></a>
+
+                <div class="fly-panel detail-box" id="flyReply">
+                    <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+                        <legend>回帖</legend>
+                    </fieldset>
+                    <ul class="jieda" id="jieda">
+                        <!-- 无数据时 -->
+                         <li id="Replace" class="fly-none" style="display:none">消灭零回复</li> 
+                        
+                    </ul>
+                    <div id="demo0" style="text-align:center"></div>
+                    <div class="layui-form layui-form-pane">
+                        <form action="/Posts/WritePoastReply" method="post" lay-filter="test1">
+                            <div class="layui-form-item layui-form-text">
+
+                                <div class="layui-input-block">
+                                    <textarea id="L_content" name="content" required lay-verify="required" placeholder="请输入内容" class="layui-textarea fly-editor" style="height: 150px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <input type="hidden" id="replyid" name="pid" value="1">
+                                <button class="layui-btn" lay-filter="*" lay-submit>提交回复</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="layui-col-md4">
+                <dl class="fly-panel fly-list-one">
+                    <dt class="fly-panel-title">本周热议</dt>
+                    <div id="DetailHostPost"></div>
+
+                    <!-- 无数据时 -->
+                    
+                    <div id="DetailHostPostNoData" class="fly-none" style="display:none">没有相关数据</div>
+                    
+                </dl>
+                <div class="fly-panel">
+                    <div class="fly-panel-title">
+                        这里可作为信息发布区域（工作 or 生活）
+                    </div>
+                    <div class="fly-panel-main">
+                        <a href="https://www.wenjuan.com/s/73u2auJ" target="_blank" class="fly-zanzhu" time-limit="2017.09.25-2019.10.01" style="background-color: #393D49;">保融每日C</a>
+                    </div>
+                </div>
+                <div class="fly-panel" style="padding: 20px 0; text-align: center;">
+                    <img src="~/Assets/images/PersonCount.jpg" style="max-width: 60%;">
+                    <p style="position: relative; color: #666;">微信扫码关注 嘎子</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!--热议模板-->
+<script id='HostPotTpl' type="text/html">
+    <dd>
+        <a href="/Posts/PostDetail?titleId={{ d.TitleId }}">{{ d.TitleName }}</a>
+        <span><i class="iconfont icon-pinglun1"></i> {{ d.AnswerCount }}</span>
+    </dd>
+</script>
+<!--作者信息模板-->
+<script id='AuthorInfotpl' type="text/html">
+    <a class="fly-avatar" href="/User/Home?UserId={{ d.AuthorId }}">
+        <img src="{{ d.Img }}" alt="-.-">
+    </a>
+    <div class="fly-detail-user">
+        <a href="/User/Home?UserId={{ d.AuthorId }}" class="fly-link">
+            <cite>{{ d.AuthorName}}</cite>
+            <i class="iconfont icon-renzheng" title="认证信息：-.-"></i>
+            <i class="layui-badge fly-badge-vip">VIP{{ d.Grade }}</i>
+        </a>
+        <span>{{ d.Time }}</span>
+    </div>
+    <div class="detail-hits" id="LAY_jieAdmin" data-id="123">
+        <span style="padding-right: 10px; color: #FF7200">悬赏：{{ d.Award }}飞吻</span>
+    </div>
+</script>
+<!--回帖模板-->
+<script id='ReturnCard' type="text/html">
+    <li data-id="{{ d.Id }}" class="" id="ReplyCard">
+        <a name="item-{{ d.Id }}"></a>
+        <div class="detail-about detail-about-reply">
+            <a class="fly-avatar" href="/User/Home?UserId={{ d.UserId }}">
+                <img src="{{ d.Img }}" alt="">
+            </a>
+            <div class="fly-detail-user">
+                <a href="" class="fly-link">
+                    <cite>{{ d.Name }}</cite>
+                    <i class="iconfont icon-renzheng" title="认证信息：-.-"></i>
+                    <i class="layui-badge fly-badge-vip">VIP{{ d.Grade }}</i>
+                </a>
+
+                <span style="{{# if(!d.IsMe){ }}display:none;{{# } }}">(楼主)</span>
+
+                <span style="{{# if(!d.IsAdmin){ }}display:none;{{# } }}color:#5FB878">(管理员)</span>
+                <span style="{{# if(!d.IsCommunityGard){ }}display:none;{{# } }}color:#FF9E3F">（社区之光）</span>
+                <span style="{{# if(d.IsLife){ }}display:none;{{# } }}color:#999">（该号已被封）</span>
+
+            </div>
+            <div class="detail-hits">
+                <span>{{ d.Time }}</span>
+            </div>
+            <i class="iconfont icon-caina" style="{{# if(!d.IsGood){ }}display:none;{{# } }}" title="最佳答案"></i>
+        </div>
+        <div id="replyconte" class="detail-body jieda-body photos">
+            {{ d.Content }}
+        </div>
+        <div class="jieda-reply">
+            <span type="zan" class="jieda-zan{{# if(d.IsLike){ }} zanok{{# } }}">
+                <i class="iconfont icon-zan"></i>
+                <em>{{ d.LikeCount }}</em>
+            </span>
+            <span type="reply">
+                <i class="iconfont icon-svgmoban53"></i>
+                回复
+            </span>
+            <div class="jieda-admin">
+                <span type="edit" style="{{# if(!d.IsCurrentUser){ }}display:none;{{# } }}">编辑</span>
+                <span type="del" style="{{# if(!d.IsCurrentUser){ }}display:none;{{# } }}">删除</span>
+                <span class="jieda-accept" type="accept" style="{{# if(!d.IsPublish){ }}display:none;{{# } }}">采纳</span>
+            </div>
+        </div>
+    </li>
+</script>
+
+<script>
+    $(function () {
+        @*layui.use(['laypage','layer'],function(){
+            var laypage = layui.laypage
+            ,layer = layui.layer;
+
+            han.ajax({
+                url:'/Posts/GetPostReplyCount/',
+                data:{ PostId: @ViewBag.PostId },
+                success:function(data){
+                    if(data.Success){
+                        han.page({
+                            elem:'demo0',
+                            count:data.Data
+                        });
+                    }
+                }
+            })
+        });*@
+
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+            , layer = layui.layer;
+
+            han.ajax({
+                url:'/Posts/GetPostReplyCount/',
+                data:{ PostId: @ViewBag.PostId },
+                success:function(data){
+                    laypage.render({
+                        elem: 'demo0'
+                      , count: data.Data //数据总数
+                      , limit: 5
+                      , groups: 5
+                        //, curr: location.hash.replace('#!fenye=', '') //获取起始页
+                        //, hash: 'fenye' //自定义hash值
+                      , jump: function (obj, first) {
+                          //首次不执行
+                          if (!first) {
+                              var replyTop = $('#flyReply').offset().top-80;
+                              $('html,body').scrollTop(replyTop);
+                              LoadPage(obj.curr,obj.limit,first);
+                          }
+                      }
+                    });
+                }
+            });
+
+
+        });
+
+        
+
+        layui.config({
+            //version: "3.0.0"
+            base: '../Assets/mods/'
+        }).extend({
+            fly: 'index'
+            //,jie:'jie'
+        });
+        $('#replyid').attr('value',@ViewBag.PostId);
+        //设置文章作者信息
+        han.ajax({
+            url: '/Posts/GetPostDetailById',
+            data: { PostId: @ViewBag.PostId },
+            success: function (data) {
+                if (data.Success) {
+                    //请求获取当前是否为登入状态
+                    HasLogin();
+                    $('#DetailTitle').text(data.Data.Title);
+
+                    $('#DetailData').append("<a href='#comment'><i class='iconfont' title='回答'>&#xe60c;</i>" + data.Data.AnswerNumber + "</a><i class='iconfont' title='人气'>&#xe60b;</i>" + data.Data.Visitor);
+
+                    switch (data.Data.HasEnd) {
+                        case 1:
+                            $('#DetailState').prepend("<span class='layui-badge' style='background-color: #999;'>未结</span>&nbsp");
+                            break;
+                        case 2:
+                            $('#DetailState').prepend("<span class='layui-badge' style='background-color: #5FB878;'>已结</span>&nbsp");
+                            break;
+                        case 3:
+                            $('#DetailState').prepend("<span class='layui-badge'>审核中</span> ");
+                            break;
+                    }
+                    switch (data.Data.Type) {
+                        case 1:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>提问</span>&nbsp");
+                            break;
+                        case 2:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>分享</span>&nbsp");
+                            break;
+                        case 3:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>讨论</span>&nbsp");
+                            break;
+                        case 4:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>建议</span>&nbsp");
+                            break;
+                        case 5:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>公告</span>&nbsp");
+                            break;
+                        case 6:
+                            $('#DetailState').prepend("<span class='layui-badge layui-bg-green fly-detail-column'>动态</span>&nbsp");
+                            break;
+                    }
+                    if(data.Data.IsGood == 1){
+                        $('#DetailState').prepend("<span class='layui-badge layui-bg-red'>精帖</span>&nbsp");
+                    }
+                    if(data.Data.IsTop == 1){
+                        $('#DetailState').prepend("<span class='layui-badge layui-bg-black'>置顶</span>&nbsp");
+                    }
+                    han.tpl({
+                        data:{
+                            AuthorId: data.Data.AuthorId,
+                            AuthorName: data.Data.Author,
+                            Img: data.Data.Img,
+                            Grade: data.Data.Grade,
+                            Time: data.Data.Time,
+                            Award: data.Data.Award
+                        },
+                        view: AuthorInfotpl.innerHTML,
+                        id: "#AuthorInfo"
+                    });
+                }
+            }
+        })
+        //加载热议
+        han.ajax({
+            url: '/Home/GetHotPoasts',
+            success: function (data) {
+                if (data.Success) {
+                    $('#DetailHostPostNoData').css('display', 'none');
+                    for (var i = 0; i < data.Data.length; i++) {
+                        han.tpl({
+                            data: { //数据
+                                "TitleId": data.Data[i].TitleId
+                                , "TitleName": data.Data[i].TitleName
+                                , "AnswerCount": data.Data[i].AnswerCount
+                            },
+                            view: HostPotTpl.innerHTML,
+                            id: '#DetailHostPost'
+                        });
+                    }
+                }
+                else {
+                    $('#DetailHostPostNoData').css('display','block');
+                }
+            }
+        });
+        //加载文章明细
+        han.ajax({
+            url: '/Posts/GetPostContent',
+            data: { PostId: @ViewBag.PostId },
+            success: function (data) {
+                if (data.Success) {
+                    layui.use(['fly', 'face'], function () {
+                        var fly = layui.fly;
+                        $('#PostContent').prepend(data.Data.Content);
+                        $('#PostContent').each(function () {
+                            var othis = $(this), html = othis.html();
+                            othis.html(fly.content(html));
+                        });
+                    });
+                }
+            }
+        });
+        LoadPage(1,5,true);
+        var flage = true;//判断是否第一次加载
+        function LoadPage(cur,limt,first){
+            //加载回帖
+            han.ajax({
+                url: '/Posts/GetPostReturnCard',
+                data: {
+                    PostId: @ViewBag.PostId ,
+                Curr:cur,
+                Limit:limt
+            },
+            success: function (data) {
+                if (data.Success) {
+                    $('#jieda').empty();
+                    $('#Replace').css('display', 'none');
+                    for (var i = data.Data.length -1 ; i >= 0; --i) {
+                        han.tpl({
+                            data: { //数据
+                                "Id": data.Data[i].Id
+                                , "Img": data.Data[i].Img
+                                , "Name": data.Data[i].Name
+                                , "Grade": data.Data[i].Grade
+                                , "IsMe": data.Data[i].IsMe
+                                , "IsAdmin": data.Data[i].IsAdmin
+                                , "IsCommunityGard": data.Data[i].IsCommunityGard
+                                , "IsLife": data.Data[i].IsLife
+                                , "IsGood": data.Data[i].IsGood
+                                , "Time": data.Data[i].ReplyTime
+                                , "Content": data.Data[i].Content
+                                , "LikeCount": data.Data[i].LikeNums
+                                , "IsCurrentUser": data.Data[i].IsCurrentUser
+                                , "IsLike": data.Data[i].Islike
+                                , "UserId": data.Data[i].ReplyUserID
+                                , "IsPublish":data.Data[i].IsPublish
+                            },
+                            view: ReturnCard.innerHTML,
+                            id: '#jieda'
+                        });
+                    }
+                    layui.use(['fly','face','laypage','layer'], function () {
+                        var fly = layui.fly;
+
+                        // #replyconte
+                        $('.detail-body.jieda-body.photos').each(function () {
+                            var othis = $(this), html = othis.html();
+                            othis.html(fly.content(html));
+                        });
+                    });
+                }
+                else {
+                    $('#Replace').css('display', 'block');
+                }
+
+                if(first){
+                    layui.config({
+                        base: '../Assets/mods/'
+                    }).extend({
+                        jie:'jie'
+                        ,version: true
+                    });
+                }
+                layui.use(['jie','element'], function(){
+                    var jie = layui.jie;
+                    jie.hello();
+                });
+
+
+            }
+        });
+    }
+    //设置收藏按钮是否可见
+        function HasLogin(){
+            han.ajax({
+                url:'/Posts/GetTitleState',
+                data:{
+                    PostId:'@ViewBag.PostId'
+                },
+                success:function(data){
+                    if(data.Success){
+                        if(data.Data){
+                            $('#Collect').addClass("layui-btn-primary");
+                            $('#Collect').text("取消收藏");
+                        }
+                        $("#Collect").show();
+                    }
+                    else{
+                        $("#Collect").hide();
+                    }
+                }
+            });
+        }
+        $('#Collect').click(function(){
+            CollectClick();
+        });
+        //收藏按钮点击事件
+        function CollectClick(){
+            if($('#Collect').hasClass("layui-btn-primary")) //取消收藏
+            {
+
+                han.ajax({
+                    url:'/Posts/DeleteCollectRela',//这边还需要增加路径
+                    data:{
+                        PostId: '@ViewBag.PostId'
+                    },
+                    beforeSend:function(){
+                        $('#Collect').removeClass("layui-btn-primary");
+                        $('#Collect').text("收藏");
+                    },
+                    success:function(data){
+                        if(!data.Success){
+                            $('#Collect').addClass("layui-btn-primary");
+                            $('#Collect').text("取消收藏");
+                            han.message("取消出错了");
+                        }
+                    }
+                });
+            }
+            else //收藏
+            {
+                han.ajax({
+                    url:'/Posts/InsertCollectRela',//这边还需要增加路径
+                    data:{
+                        PostId: '@ViewBag.PostId'
+                    },
+                    beforeSend:function(){
+                        $('#Collect').addClass("layui-btn-primary");
+                        $('#Collect').text("取消收藏");
+                    },
+                    success:function(data){
+                        if(!data.Success){
+                            $('#Collect').removeClass("layui-btn-primary");
+                            $('#Collect').text("收藏");
+                            han.message("收藏出错了");
+                        }
+                    }
+                });
+            }
+            return;
+        }
+    });
+
+</script>
+</html>

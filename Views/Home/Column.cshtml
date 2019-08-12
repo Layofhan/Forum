@@ -1,0 +1,465 @@
+﻿@{
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lay社区</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Lay社区">
+    <meta name="description" content="Lay社区作为Han心中乌托邦世界">
+</head>
+
+
+<body>
+    <div class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md8">
+                <div class="fly-panel" style="margin-bottom: 0;">
+
+                    <div class="fly-panel-title fly-filter">
+                        <a href="/Home/Column?Types=@ViewBag.PostType&&State=0&&Mode=@ViewBag.Mode" class="layui-this" id="Synthesize">综合</a>
+                            <span class="fly-mid"></span>
+                        <a href="/Home/Column?Types=@ViewBag.PostType&&State=1&&Mode=@ViewBag.Mode" id="Ready">未结</a>
+                            <span class="fly-mid"></span>
+                        <a href="/Home/Column?Types=@ViewBag.PostType&&State=2&&Mode=@ViewBag.Mode" onclick="GetHasEnd()" id="End">已结</a>
+                            <span class="fly-mid"></span>
+                        <a href="/Home/Column?Types=@ViewBag.PostType&&State=3&&Mode=@ViewBag.Mode" onclick="GetEssence()" id="Essence">精华</a>
+                            <span class="fly-filter-right layui-hide-xs">
+                                <a href="/Home/Column?Types=@ViewBag.PostType&&State=@ViewBag.State&&Mode=0" class="layui-this" id="Newst">按最新</a>
+                                <span class="fly-mid"></span>
+                                <a href="/Home/Column?Types=@ViewBag.PostType&&State=@ViewBag.State&&Mode=1" id="Host">按热议</a>
+                            </span>
+                        </div>
+
+                    <ul class="fly-list">
+                        <div id="postmain" class="fly-none" style="display:block">还没有该类型的帖子，去发一个吧</div>
+                        <div id="ComprehensiveContainer"></div>
+                    </ul>
+ 
+                    <div style="text-align: center">
+                        <div id="demo0" style="text-align:center"></div>
+                        @*<div class="laypage-main">
+
+                            <a href="Column" class="laypage-next">更多干货</a>
+                        </div>*@
+                    </div>
+
+                </div>
+            </div>
+            <div class="layui-col-md4">
+
+                <dl class="fly-panel fly-list-one">
+                    <dt class="fly-panel-title">本周热议</dt>
+                    <div id="HostPot"></div>
+                    <!-- 无数据时 -->          
+                    <div class="fly-none" id="hostdata" style="display:none">没有相关数据</div>
+                    
+                </dl>
+
+                @*<div class="fly-panel">
+                        <div class="fly-panel-title">
+                            这里可作为广告区域
+                        </div>
+                        <div class="fly-panel-main">
+                            <a href="http://layim.layui.com/?from=fly" target="_blank" class="fly-zanzhu" time-limit="2017.09.25-2099.01.01" style="background-color: #5FB878;">LayIM 3.0 - layui 旗舰之作</a>
+                        </div>
+                    </div>*@
+
+                <div class="fly-panel fly-link">
+                    <h3 class="fly-panel-title">友情链接</h3>
+                    <dl class="fly-panel-main">
+                        <dd><a href="http://www.fingard.com/index.html" target="_blank">保融首页</a>
+                        <dd>
+                        <dd><a href="http://mail.fingard.com" target="_blank">保融邮箱链接</a>
+                        <dd>
+
+                    </dl>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+<!--首页帖子显示模板-->
+<script id='TitleTpl' type="text/html">
+    <li>
+        <a href="/User/Home?UserId={ d.AuthorId }}" class="fly-avatar">
+            <img src="{{ d.Img }}" alt="嘎子"><!--头像路径-->
+        </a>
+        <h2>
+            <a class="layui-badge">{{ d.Type }}</a><!--文章类型，如提问、分享、讨论等-->
+            <a href="/Posts/PostDetail?TitleId={{ d.TitleId }}">{{ d.Title }}</a><!--文章标题-->
+        </h2>
+        <div class="fly-list-info">
+            <a href="/User/Home?UserId={{ d.AuthorId }}" link>
+                <cite>{{ d.Author }}</cite><!--作者-->
+                <!--<i class="iconfont icon-renzheng" title="认证信息：{{ d.Identity }}"></i>--><!--认证信息-->
+                <i class="layui-badge fly-badge-vip">VIP{{ d.Grade }}</i><!--等级-->
+            </a>
+            <span>{{ d.Time }}</span><!--文章发表时间-->
+
+            <span class="fly-list-kiss layui-hide-xs" title="悬赏飞吻"><i class="iconfont icon-kiss"></i>{{ d.Award }}</span><!--回帖积分奖励数-->
+            <span class="layui-badge fly-badge-accept layui-hide-xs" style="display:{{ d.HasEnd }}">已结</span><!--是否完结-->
+            <span class="fly-list-nums">
+                <i class="iconfont icon-pinglun1" title="回答"></i> {{ d.AnswerNumber }}<!--回答数量-->
+            </span>
+        </div>
+        <div class="fly-list-badge">
+            <span class="layui-badge layui-bg-red" style="display:{{ d.IsGood }}">精帖</span><!--是否属于精帖-->
+        </div>
+    </li>
+</script>
+<!--本周热议模板-->
+<script id='HostPotTpl' type="text/html">
+    <dd>
+        <a href="/Posts/PostDetail?titleId={{ d.TitleId }}">{{ d.TitleName }}</a>
+        <span><i class="iconfont icon-pinglun1"></i> {{ d.AnswerCount }}</span>
+    </dd>
+</script>
+
+<script>
+    //layui.config({
+    //    //version: "3.0.0"
+    //    base: '../Assets/mods/'
+    //}).extend({
+    //    fly: 'index'
+    //    //,jie:'jie'
+    //});
+    $(function () {
+        $("#Login").hover(function () {
+            $("#Login dl").show();
+        });
+        $("#indexError").mouseleave(function () {
+            setTimeout(function () { }, 100);
+            var x = event.clientX; var y = event.clientY+5;
+            var div = $("#error");
+            var divx1 = div.offset().left; var divy1 = div.offset().top;
+            var divx2 = div.offset().left + 120;
+            var divy2 = div.offset().top + 164;
+            if( x < divx1 || x > divx2 || y < divy1 || y > divy2)
+            {
+                setTimeout(function () { $("#Login dl").hide(); }, 400);
+            }
+        });
+        $("#Login dl").mouseleave(function () {
+            setTimeout(function () { $("#Login dl").hide(); }, 400);
+        });
+    })
+    var url = "/Home/GetPostReplyCount";
+    var State;//帖子状态
+    var Type;//帖子类型
+    var Mode;//排序模式
+    var Count;//帖子数量
+
+
+    //渲染帖子
+    function ParseComprehensiveData(data) {
+        for (var i = 0; i < data.length; i++) {
+            var type = "其他";
+            switch (data[i].Type) {
+                case 1:
+                    type = "提问";
+                    break;
+                case 2:
+                    type = "分享";
+                    break;
+                case 3:
+                    type = "讨论";
+                    break;
+                case 4:
+                    type = "建议";
+                    break;
+                case 5:
+                    type = "公告";
+                    break;
+                case 6:
+                    type = "动态";
+                    break;
+            }
+            var hasEnd = "";
+            if (data[i].HasEnd == 1 || data[i].HasEnd == 3) {
+                hasEnd = "none";
+            }
+            var idGood = "";
+            if (data[i].IsGood == 0) {
+                idGood = "none";
+            }
+            han.tpl({
+                data: { //数据
+                    "Img": data[i].Img
+                    , "Type": type
+                    , "Title": data[i].Title
+                    , "Author": data[i].Author
+                    , "Grade": data[i].Grade
+                    , "Time": data[i].Time
+                    , "Award": data[i].Award
+                    , "HasEnd": hasEnd
+                    , "AnswerNumber": data[i].AnswerNumber
+                    , "IsGood": idGood
+                    , "AuthorId": data[i].AuthorId
+                    , "TitleId": data[i].TitleId
+                },
+                view: TitleTpl.innerHTML,
+                id: '#ComprehensiveContainer'
+            });
+        }
+    }
+
+    //渲染分页组件
+    function LoadPageCompents(count, limit) {
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+            , layer = layui.layer;
+            laypage.render({
+                elem: 'demo0'
+              , count: count //数据总数
+              , limit: limit
+              , groups: 5
+              , jump: function (obj, first) {
+                  //首次不执行
+                  if (!first) {
+                      var replyTop = $('#ComprehensiveContainer').offset().top - 120;
+                      $('html,body').scrollTop(replyTop);
+                      console.log(obj);
+                      GetPost(Type, State, Mode, obj.curr, obj.limit);
+                  }
+              }
+            });
+        });
+    }
+
+    //加载热议
+    function GetHotPoasts() {
+        han.ajax({
+            url: '/Home/GetHotPoasts',
+            success: function (data) {
+                if (data.Success) {
+                    if(data.Data != null){
+                        $("#hostdata").css("display","none");
+                        ParseHostPotData(data.Data);
+                    }else{
+                        $("#hostdata").css("display","block");
+                    }
+                    
+                }
+                else {
+                    //这边应该需要跳转到错误页面
+                    //han.message("数据请求错误，请联系管理员");
+                }
+            }
+        });
+    }
+    //渲染10条本周热议
+    function ParseHostPotData(data) {
+        for (var i = 0; i < data.length; i++) {
+            han.tpl({
+                data: { //数据
+                    "TitleId": data[i].TitleId
+                    , "TitleName": data[i].TitleName
+                    , "AnswerCount": data[i].AnswerCount
+                },
+                view: HostPotTpl.innerHTML,
+                id: '#HostPot'
+            });
+        }
+    }
+    //加载分页组件
+    //LoadPageCompents()
+
+    //页面执行时运行函数
+    function index() {
+        var type = "@ViewBag.PostType";
+        var state = "@ViewBag.State";
+        var model = "@ViewBag.Mode";
+        //加载热议
+        GetHotPoasts();
+        //设置样式
+        SetLaythis();
+        //获取对应类型的数量
+        GetPostCount(type, state);
+        if (Count <= 0) {
+            return;
+        }
+        Type = type;
+        State = state;
+        Mode = model;
+        //获取并渲染帖子
+        GetPost(type, state, model, 1, 10);
+        //渲染分页工具
+        LoadPageCompents(Count, 10);
+    }
+
+    //获取不同类型帖子，不同状态帖子的数量
+    function GetPostCount(type, state) {
+        if (type == null || type == "" || state == null || state == "") {
+            return;
+        }
+        $.ajax({
+            url: '/Home/GetCountByType',
+            data: {
+                PostType: type,
+                PostState: state
+            },
+            async: false,
+            success: function (data) {
+                if (data > 0) {
+                    $('#postmain').css("display", "none");
+                    Count = data;
+                }
+                else {
+                    Count = - 1;
+                }
+            }
+        });
+    }
+
+    //获取帖子
+    function GetPost(type, state, mode,cur, limi) {
+        han.ajax({
+            url: '/Home/GetPostBySyn',
+            data: {
+                PostType:type,
+                PostState:state,
+                SearchMode:mode,
+                Curr:cur,
+                Limit: limi
+            },
+            success: function (data) {
+                if (data.Success) {
+                    if (data.Data != null) {
+                        $('#ComprehensiveContainer').empty();
+                        //$('#Synthesize').addClass("layui-this");
+                        //$('#Ready').removeClass("layui-this");
+                        //$('#End').removeClass("layui-this");
+                        //$('#Essence').removeClass("layui-this");
+
+                        ParseComprehensiveData(data.Data);
+                    }
+                    else {
+                        $('#ComprehensiveContainer').empty();
+                        $('#postmain').css("display", "block");
+                        han.message(data.Message);
+                    }
+                }
+                else {
+                    //这边应该需要跳转到错误页面
+                    //han.message("数据请求错误，请联系管理员");
+                }
+            }
+        })
+    }
+
+    //设置lay-this
+    function SetLaythis() {
+        var state = @ViewBag.State;
+        var type = @ViewBag.PostType;
+        var mode = @ViewBag.Mode;
+        //状态
+            switch (state) {
+            case 0:
+                $("#Synthesize").addClass("layui-this");
+                $("#Ready").removeClass("layui-this");
+                $("#End").removeClass("layui-this");
+                $("#Essence").removeClass("layui-this");
+                break;
+            case 1:
+                $("#Synthesize").removeClass("layui-this");
+                $("#Ready").addClass("layui-this");
+                $("#End").removeClass("layui-this");
+                $("#Essence").removeClass("layui-this");
+                break;
+            case 2:
+                $("#Synthesize").removeClass("layui-this");
+                $("#Ready").removeClass("layui-this");
+                $("#End").addClass("layui-this");
+                $("#Essence").removeClass("layui-this");
+                break;
+            case 3:
+                $("#Synthesize").removeClass("layui-this");
+                $("#Ready").removeClass("layui-this");
+                $("#End").removeClass("layui-this");
+                $("#Essence").addClass("layui-this");
+                break;
+            }
+        //排序模式
+            if(mode == 0){
+                $("#Newst").addClass("layui-this");
+                $("#Host").removeClass("layui-this");
+            }else{
+                $("#Newst").removeClass("layui-this");
+                $("#Host").addClass("layui-this");
+            }
+        //种类
+            switch(type){
+                case 0:
+                    $("#index").addClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 1:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").addClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 2:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").addClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 3:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").addClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 4:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").addClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 5:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").addClass("layui-this");
+                    $("#Moment").removeClass("layui-this");
+                    break;
+                case 6:
+                    $("#index").removeClass("layui-this");
+                    $("#Quiz").removeClass("layui-this");
+                    $("#Share").removeClass("layui-this");
+                    $("#Discuss").removeClass("layui-this");
+                    $("#Suggest").removeClass("layui-this");
+                    $("#Notice").removeClass("layui-this");
+                    $("#Moment").addClass("layui-this");
+                    break;
+            }
+    }
+    index();
+</script>
+</html>
